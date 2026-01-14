@@ -36,11 +36,11 @@ export default function LandingPage() {
         <ScrollReveal>
           <div className="container mx-auto px-4">
             <h1 className="text-4xl md:text-5xl font-bold text-[#333333] mb-4 tracking-tight">
-              Online PDF editor
+              Online PDF Tools
               <span className="text-xs text-slate-400 font-normal align-top ml-2 border border-slate-200 rounded px-1">BETA</span>
             </h1>
             <p className="text-xl text-[#666666] mb-12 font-normal">
-              Edit PDF files for free. Fill & sign PDF
+              Free online PDF tools. Fill & sign PDF
             </p>
 
             <div className="flex flex-col items-center justify-center gap-4">

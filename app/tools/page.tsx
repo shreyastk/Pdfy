@@ -27,12 +27,7 @@ const tools = [
     href: "/tools/extract-text",
     icon: toolIcons.extractText,
   },
-  {
-    name: "Edit Metadata",
-    description: "Modify PDF title, author, and keywords",
-    href: "/tools/edit-metadata",
-    icon: toolIcons.editMetadata,
-  },
+
   {
     name: "Split PDF",
     description: "Extract pages or split into multiple files.",

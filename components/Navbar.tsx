@@ -25,9 +25,7 @@ export default function Navbar() {
           <Link href="/tools/compress" className="text-[15px] font-medium text-slate-600 hover:text-[#009966] transition-colors">
             Compress
           </Link>
-          <Link href="/tools/edit" className="text-[15px] font-medium text-slate-600 hover:text-[#009966] transition-colors">
-            Edit
-          </Link>
+
           <Link href="/tools/sign" className="text-[15px] font-medium text-slate-600 hover:text-[#009966] transition-colors">
             Sign
           </Link>
