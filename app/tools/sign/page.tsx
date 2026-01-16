@@ -1,14 +1,25 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Document, Page, pdfjs } from "react-pdf";
+import dynamic from "next/dynamic";
+import { pdfjs } from "react-pdf";
 import FileUploader from "@/components/FileUploader";
 import SignaturePad from "@/components/SignaturePad";
 import { signPDF, downloadPDF } from "@/lib/pdf-operations";
-// CSS imports removed as text/annotation layers are disabled
+
+// Dynamic import for react-pdf components to avoid SSR issues
+const Document = dynamic(() => import("react-pdf").then((mod) => mod.Document), {
+    ssr: false,
+    loading: () => <div className="animate-pulse flex space-x-4"><div className="h-96 w-64 bg-slate-300 rounded"></div></div>
+});
+const Page = dynamic(() => import("react-pdf").then((mod) => mod.Page), {
+    ssr: false,
+});
 
 // Configure worker for react-pdf
-pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+if (typeof window !== "undefined") {
+    pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+}
 
 interface FileWithPreview extends File {
     preview?: string;
@@ -274,7 +285,6 @@ export default function SignPDF() {
                             <Document
                                 file={file}
                                 onLoadSuccess={handleDocumentLoadSuccess}
-                                loading={<div className="animate-pulse flex space-x-4"><div className="h-96 w-64 bg-slate-300 rounded"></div></div>}
                                 className="flex flex-col gap-8"
                             >
                                 {Array.from(new Array(numPages), (el, index) => (
