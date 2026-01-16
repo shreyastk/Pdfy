@@ -1,7 +1,5 @@
 import { PDFDocument, degrees, rgb, StandardFonts } from "pdf-lib";
 import { encryptPDF as encryptPDFBytes } from "@pdfsmaller/pdf-encrypt-lite";
-import jsPDF from "jspdf";
-import html2canvas from "html2canvas";
 
 export async function signPDF(
   file: File,
@@ -248,6 +246,7 @@ export async function compressPDF(file: File): Promise<Uint8Array> {
   const numPages = pdfDoc.numPages;
 
   // Create a new PDF with jsPDF
+  const { default: jsPDF } = await import("jspdf");
   // @ts-ignore
   const newPdf = new jsPDF({
     orientation: "p",
@@ -533,6 +532,7 @@ export async function htmlToPDF(
 
     // Use html2canvas to capture the HTML as an image
     // Scale 2 means 2x resolution, so canvas will be 2x the size
+    const { default: html2canvas } = await import("html2canvas");
     const html2canvasScale = 2;
     const canvas = await html2canvas(bodyElement, {
       scale: html2canvasScale, // Higher quality (2x resolution)
@@ -562,6 +562,7 @@ export async function htmlToPDF(
     const availableHeight = pageHeight - marginInUnit * 2;
 
     // Create PDF using jsPDF
+    const { default: jsPDF } = await import("jspdf");
     const pdf = new jsPDF({
       orientation: options?.orientation === "landscape" ? "landscape" : "portrait",
       unit: isLetter ? "in" : "mm",

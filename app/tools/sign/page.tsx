@@ -2,7 +2,6 @@
 
 import { useState, useRef, useEffect } from "react";
 import dynamic from "next/dynamic";
-import { pdfjs } from "react-pdf";
 import FileUploader from "@/components/FileUploader";
 import SignaturePad from "@/components/SignaturePad";
 import { signPDF, downloadPDF } from "@/lib/pdf-operations";
@@ -15,11 +14,6 @@ const Document = dynamic(() => import("react-pdf").then((mod) => mod.Document), 
 const Page = dynamic(() => import("react-pdf").then((mod) => mod.Page), {
     ssr: false,
 });
-
-// Configure worker for react-pdf
-if (typeof window !== "undefined") {
-    pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
-}
 
 interface FileWithPreview extends File {
     preview?: string;
@@ -38,6 +32,14 @@ export default function SignPDF() {
     const [pageWidth, setPageWidth] = useState<number>(0);
     const [scale, setScale] = useState(1);
     const containerRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const initPDFWorker = async () => {
+            const { pdfjs } = await import("react-pdf");
+            pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+        };
+        initPDFWorker();
+    }, []);
 
     useEffect(() => {
         // Responsive PDF scaling
