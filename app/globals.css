@@ -1,5 +1,10 @@
 @import "tailwindcss";
 
+/* Enable class-based dark mode in Tailwind v4: the `dark` variant applies
+   when a `dark` class is present on an ancestor (set on <html> by the theme
+   controller / pre-paint script). */
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
   /* Sejda-inspired Palette */
   --color-primary: #009966;

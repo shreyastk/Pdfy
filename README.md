@@ -16,20 +16,33 @@ Hi, I'm **Shreyas**. I built PDFy because I was tired of uploading my private do
 - **🆓 Free** — I made this tool free for everyone. No registration, no limits.
 - **📱 Responsive** — I spent a lot of time polishing the UI to work perfectly on both desktop and mobile.
 
-## 🛠️ The Toolkit
+## Tools
 
-Here are the tools I've implemented so far:
+All PDF processing is performed entirely client-side in your browser. No user files are ever uploaded to or transmitted to any server.
 
-| Tool | Description |
-|------|-------------|
-| **Merge PDF** | Combine multiple PDFs into one |
-| **Split PDF** | Extract specific pages from a PDF |
-| **Compress PDF** | Reduce PDF file size |
-| **Rotate PDF** | Rotate all pages by 90°, 180°, or 270° |
-| **PDF to Images** | Convert PDF pages to PNG or JPEG |
-| **Images to PDF** | Create a PDF from images |
-| **Organize Pages** | Reorder, rotate, or delete individual pages |
-| **Add Watermark** | Add text watermark to PDF pages |
+- **Merge PDF** — Combine multiple PDF files into one.
+- **Sign PDF** — Sign documents with your signature.
+- **Page Numbers** — Add page numbers to your document.
+- **Extract Text** — Copy text from PDF files
+- **Split PDF** — Extract pages or split into multiple files.
+- **Compress PDF** — Reduce file size while optimizing for quality.
+- **Rotate PDF** — Rotate PDF pages.
+- **PDF to Images** — Convert PDF pages to JPG or PNG.
+- **Images to PDF** — Convert images to PDF document.
+- **Organize Pages** — Reorder, rotate, or delete PDF pages.
+- **Add Watermark** — Add text watermark to PDF pages.
+- **Encrypt PDF** — Protect your PDF files with a password.
+- **Unlock PDF** — Remove passwords from PDF files.
+- **HTML to PDF** — Convert HTML files or code to PDF documents.
+- **Office Converter** — Convert between PDF and Word, Excel, or PowerPoint.
+- **OCR PDF** — Make scanned PDFs searchable with text recognition.
+- **Edit PDF** — Add text, shapes, and redactions to PDF pages.
+- **Fill Forms** — Fill in and complete interactive PDF form fields.
+- **Compare PDF** — Find differences between two PDF documents.
+- **Delete & Extract Pages** — Remove unwanted pages or extract a selection.
+- **Crop & Resize** — Crop margins or change PDF page dimensions.
+- **Page Layout** — Arrange pages with N-up or booklet imposition.
+- **Flatten PDF** — Flatten form fields and annotations into the page.
 
 ## 🚀 Getting Started
 
