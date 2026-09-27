@@ -2,6 +2,7 @@
 
 import { useCallback, useState } from "react";
 import FileUploader from "@/components/FileUploader";
+import { saveFile } from "@/lib/download";
 import {
   detectFields,
   validateFieldValue,
@@ -35,13 +36,7 @@ function reasonText(reason: "too-long" | "invalid-option"): string {
 
 /** Trigger a browser download of the given bytes without leaving the page. */
 function downloadBytes(data: Uint8Array, filename: string): void {
-  const blob = new Blob([data as BlobPart], { type: "application/pdf" });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = filename;
-  link.click();
-  URL.revokeObjectURL(url);
+  saveFile(data, filename, "application/pdf");
 }
 
 /**

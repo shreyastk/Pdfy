@@ -4,6 +4,7 @@ import { useState } from "react";
 import FileUploader from "@/components/FileUploader";
 import ProcessingStatus from "@/components/ProcessingStatus";
 import { downloadImage } from "@/lib/pdf-operations";
+import { loadPdfjs } from "@/lib/pdfjs";
 
 export default function PDFToImages() {
   const [file, setFile] = useState<File | null>(null);
@@ -28,9 +29,7 @@ export default function PDFToImages() {
       setMessage("Converting PDF to images...");
 
       // Dynamic import of pdfjs-dist to avoid SSR issues
-      const pdfjsLib = await import("pdfjs-dist");
-      // Use the worker from node_modules
-      pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`;
+      const pdfjsLib = await loadPdfjs();
 
       const arrayBuffer = await file.arrayBuffer();
       const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
@@ -50,6 +49,7 @@ export default function PDFToImages() {
         await page.render({
           canvasContext: context,
           viewport: viewport,
+          canvas,
         }).promise;
 
         const blob = await new Promise<Blob>((resolve) => {

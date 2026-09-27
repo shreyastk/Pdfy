@@ -38,6 +38,7 @@
  */
 
 import { PDFDocument, StandardFonts, rgb, type PDFFont } from "pdf-lib";
+import { loadPdfjs } from "@/lib/pdfjs";
 
 // ---------------------------------------------------------------------------
 // Public result shape
@@ -323,8 +324,7 @@ export async function rebuildSearchablePdf(
 export async function defaultOpenDocument(file: File): Promise<OpenedPdf> {
   const bytes = new Uint8Array(await file.arrayBuffer());
 
-  const pdfjsLib = await import("pdfjs-dist");
-  pdfjsLib.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.mjs`;
+  const pdfjsLib = await loadPdfjs();
 
   const doc = await pdfjsLib.getDocument({ data: bytes.slice() as Uint8Array }).promise;
 
@@ -340,7 +340,13 @@ export async function defaultOpenDocument(file: File): Promise<OpenedPdf> {
  */
 export async function defaultCreateRecognizer(lang: string): Promise<Recognizer> {
   const { createWorker } = await import("tesseract.js");
-  const worker = await createWorker(lang);
+  // All engine assets are self-hosted (scripts/copy-assets.mjs) so OCR never
+  // contacts a CDN and works offline once cached.
+  const worker = await createWorker(lang, undefined, {
+    workerPath: "/vendor/tesseract/worker.min.js",
+    corePath: "/vendor/tesseract/core",
+    langPath: "/vendor/tesseract/lang",
+  });
 
   return {
     async recognize(image: unknown) {

@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 import FileUploader from "@/components/FileUploader";
 import SignaturePad from "@/components/SignaturePad";
 import { signPDF, downloadPDF } from "@/lib/pdf-operations";
+import { PDFJS_WORKER_SRC } from "@/lib/pdfjs";
 
 // Dynamic import for react-pdf components to avoid SSR issues
 const Document = dynamic(() => import("react-pdf").then((mod) => mod.Document), {
@@ -36,7 +37,7 @@ export default function SignPDF() {
     useEffect(() => {
         const initPDFWorker = async () => {
             const { pdfjs } = await import("react-pdf");
-            pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+            pdfjs.GlobalWorkerOptions.workerSrc = PDFJS_WORKER_SRC;
         };
         initPDFWorker();
     }, []);

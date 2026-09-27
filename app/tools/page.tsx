@@ -1,4 +1,5 @@
 import ToolsCatalogClient from "./ToolsCatalogClient";
+import RecentFiles from "@/components/RecentFiles";
 
 export default function ToolsPage() {
   return (
@@ -14,6 +15,10 @@ export default function ToolsPage() {
         </div>
 
         <ToolsCatalogClient />
+
+        <div className="max-w-3xl mx-auto mt-16">
+          <RecentFiles />
+        </div>
       </div>
     </div>
   );

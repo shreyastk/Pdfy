@@ -1,3 +1,4 @@
+import { loadPdfjs } from "@/lib/pdfjs";
 /**
  * Page thumbnail support for the PDFy feature expansion.
  *
@@ -88,8 +89,7 @@ export async function loadPdfDocument(
         ? source
         : source;
 
-  const pdfjsLib = await import("pdfjs-dist");
-  pdfjsLib.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.mjs`;
+  const pdfjsLib = await loadPdfjs();
 
   // pdf.js accepts ArrayBuffer or typed array as `data`.
   const pdf = await pdfjsLib.getDocument({ data: data as ArrayBuffer }).promise;

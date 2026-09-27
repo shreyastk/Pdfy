@@ -5,6 +5,7 @@ import FileUploader from "@/components/FileUploader";
 import ProcessingStatus from "@/components/ProcessingStatus";
 import { organizePDF, downloadPDF } from "@/lib/pdf-operations";
 import { PDFDocument } from "pdf-lib";
+import { loadPdfjs } from "@/lib/pdfjs";
 
 interface PageInfo {
   index: number;
@@ -49,8 +50,7 @@ export default function OrganizePDF() {
   const loadThumbnails = async (pdfFile: File, count: number) => {
     setLoadingThumbnails(true);
     try {
-      const pdfjsLib = await import("pdfjs-dist");
-      pdfjsLib.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.mjs`;
+      const pdfjsLib = await loadPdfjs();
 
       const arrayBuffer = await pdfFile.arrayBuffer();
       const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
@@ -71,6 +71,7 @@ export default function OrganizePDF() {
           await page.render({
             canvasContext: context,
             viewport: viewport,
+            canvas,
           }).promise;
 
           const imageUrl = canvas.toDataURL("image/png");

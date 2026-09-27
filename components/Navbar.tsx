@@ -3,6 +3,7 @@
 import Link from "next/link";
 
 import { useState } from "react";
+import { OPEN_PALETTE_EVENT } from "@/components/CommandPalette";
 
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -32,6 +33,18 @@ export default function Navbar() {
           <Link href="/tools/merge" className="text-[15px] font-medium text-slate-600 hover:text-[#009966] transition-colors">
             Merge
           </Link>
+          <button
+            type="button"
+            onClick={() => window.dispatchEvent(new Event(OPEN_PALETTE_EVENT))}
+            className="ml-auto mr-4 flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1.5 text-sm text-slate-500 hover:border-[#009966] hover:text-[#009966] transition-colors"
+            aria-label="Search tools"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+            </svg>
+            Search tools
+            <kbd className="rounded border border-slate-200 px-1.5 text-[11px]">Ctrl K</kbd>
+          </button>
         </div>
 
         {/* Buy Me A Coffee Button - Desktop */}

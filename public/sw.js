@@ -5,13 +5,15 @@
  *  - install:  precache the app shell so the app boots offline (Req 13.1, 13.2).
  *  - activate: delete caches from previous versions, then claim clients so the
  *              updated worker controls open pages immediately (Req 13.6).
- *  - fetch:    cache-first for GET requests, falling back to the network and
- *              caching new successful responses so tool chunks get cached on
- *              first use (Req 13.3). Navigation requests that miss the cache
- *              while offline get a friendly offline fallback page (Req 13.4).
+ *  - fetch:    navigations are network-first so a new deploy is picked up on
+ *              the next load, falling back to the cached page offline. Other
+ *              same-origin GETs are cache-first, caching new successful
+ *              responses so tool chunks get cached on first use (Req 13.3).
+ *              Uncached navigations while offline get a friendly fallback
+ *              page (Req 13.4).
  *
- * To ship updated assets, bump CACHE_VERSION. The new worker precaches the new
- * shell, skipWaiting + clients.claim activate it, and old caches are purged, so
+ * CACHE_VERSION is stamped with a unique build id by scripts/stamp-sw.mjs after
+ * every build. The new worker precaches the new shell, skipWaiting + clients.claim activate it, and old caches are purged, so
  * the updated assets are served on the next load (Req 13.6).
  *
  * This file lives in public/ and is emitted verbatim by the Next.js static
@@ -24,7 +26,12 @@ const CACHE_NAME = `pdfy-shell-${CACHE_VERSION}`;
 // Core app-shell URLs to precache. Keep this list small and resilient: if any
 // single entry fails to fetch we still install (cache.addAll is all-or-nothing,
 // so we add individually and ignore per-URL failures).
-const APP_SHELL = ["/", "/tools", "/manifest.webmanifest"];
+const APP_SHELL = [
+  "/",
+  "/tools",
+  "/manifest.webmanifest",
+  "/vendor/pdfjs/pdf.worker.min.mjs",
+];
 
 // Friendly HTML shown for navigation requests that are not cached while offline.
 const OFFLINE_FALLBACK_HTML = `<!doctype html>
@@ -121,7 +128,27 @@ self.addEventListener("fetch", (event) => {
 async function handleFetch(request) {
   const cache = await caches.open(CACHE_NAME);
 
-  // Cache-first: serve a cached copy when we have one.
+  // Network-first for page navigations so users always get the latest deploy;
+  // the cached copy is only used when the network is unavailable.
+  if (request.mode === "navigate") {
+    try {
+      const response = await fetch(request);
+      if (response && response.ok && response.type === "basic") {
+        cache.put(request, response.clone());
+      }
+      return response;
+    } catch (err) {
+      const cachedPage = await cache.match(request);
+      if (cachedPage) return cachedPage;
+      return new Response(OFFLINE_FALLBACK_HTML, {
+        status: 503,
+        statusText: "Offline",
+        headers: { "Content-Type": "text/html; charset=utf-8" },
+      });
+    }
+  }
+
+  // Cache-first for everything else: serve a cached copy when we have one.
   const cached = await cache.match(request);
   if (cached) {
     return cached;

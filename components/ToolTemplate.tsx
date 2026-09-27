@@ -1,7 +1,8 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import FileUploader from "@/components/FileUploader";
+import { guessMime, saveFile } from "@/lib/download";
 import type { Progress, ToolResult, Download } from "@/lib/types";
 
 /**
@@ -23,12 +24,22 @@ export interface ToolTemplateProps {
    * The tool-specific operation. Receives the selected files and a progress
    * reporter, performs all work in-browser (Req 15.7), and resolves with the
    * downloadable result. Throwing (or rejecting) drives the error state.
+   *
+   * `signal` is aborted when the user presses Cancel. Long-running tools
+   * should check it between steps and stop early; either way the template
+   * discards the result of a cancelled run.
    */
-  onRun: (files: File[], onProgress: (p: Progress) => void) => Promise<ToolResult>;
+  onRun: (
+    files: File[],
+    onProgress: (p: Progress) => void,
+    signal: AbortSignal,
+  ) => Promise<ToolResult>;
   /** Tool-specific controls rendered inside the upload region. */
   children?: React.ReactNode;
   /** Optional label for the run button (defaults to "Run"). */
   runLabel?: string;
+  /** Extra tool-specific content shown in the result region (e.g. a preview). */
+  resultExtra?: React.ReactNode;
 }
 
 const ACCENT = "#009966";
@@ -38,9 +49,8 @@ function toBlob(download: Download): Blob {
   if (download.data instanceof Blob) {
     return download.data;
   }
-  // Uint8Array -> Blob. Default to PDF mime since most tools emit PDFs;
-  // the filename extension still drives the saved type for the user.
-  return new Blob([download.data as BlobPart], { type: "application/pdf" });
+  // Uint8Array -> Blob, typed from the filename extension.
+  return new Blob([download.data as BlobPart], { type: guessMime(download.filename) });
 }
 
 /**
@@ -60,12 +70,14 @@ export default function ToolTemplate({
   onRun,
   children,
   runLabel = "Run",
+  resultExtra,
 }: ToolTemplateProps) {
   const [files, setFiles] = useState<File[]>([]);
   const [status, setStatus] = useState<ToolStatus>("idle");
   const [message, setMessage] = useState("");
   const [progress, setProgress] = useState<Progress | null>(null);
   const [result, setResult] = useState<ToolResult | null>(null);
+  const abortRef = useRef<AbortController | null>(null);
 
   const handleFilesSelected = useCallback((selected: File[]) => {
     setFiles(selected);
@@ -89,29 +101,43 @@ export default function ToolTemplate({
     setProgress(null);
     setResult(null);
 
+    const controller = new AbortController();
+    abortRef.current = controller;
+    const cancelled = () => controller.signal.aborted || abortRef.current !== controller;
+
     try {
-      const toolResult = await onRun(files, (p) => setProgress(p));
+      const toolResult = await onRun(
+        files,
+        (p) => !cancelled() && setProgress(p),
+        controller.signal,
+      );
+      if (cancelled()) return;
       // Success -> show result/download region (Req 15.5).
       setResult(toolResult);
       setStatus("success");
       setMessage("Done.");
     } catch (error) {
+      if (cancelled()) return;
       // Error -> show message, KEEP selected files (Req 15.6).
       const reason =
         error instanceof Error ? error.message : "An unexpected error occurred.";
       setStatus("error");
       setMessage(reason);
+    } finally {
+      if (abortRef.current === controller) abortRef.current = null;
     }
   }, [files, onRun]);
 
+  const handleCancel = useCallback(() => {
+    abortRef.current?.abort();
+    abortRef.current = null;
+    setStatus("idle");
+    setMessage("");
+    setProgress(null);
+  }, []);
+
   const handleDownload = useCallback((download: Download) => {
-    const blob = toBlob(download);
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = download.filename;
-    link.click();
-    URL.revokeObjectURL(url);
+    saveFile(toBlob(download), download.filename);
   }, []);
 
   const progressPct =
@@ -185,9 +211,16 @@ export default function ToolTemplate({
                         className="w-5 h-5 border-2 rounded-full animate-spin border-t-transparent"
                         style={{ borderColor: ACCENT, borderTopColor: "transparent" }}
                       />
-                      <span className="text-sm font-medium text-slate-700 dark:text-slate-200">
+                      <span className="flex-1 text-sm font-medium text-slate-700 dark:text-slate-200">
                         {progress?.label || message}
                       </span>
+                      <button
+                        type="button"
+                        onClick={handleCancel}
+                        className="px-3 py-1 text-sm font-medium rounded-lg border border-slate-300 dark:border-slate-500 text-slate-600 dark:text-slate-300 hover:border-red-400 hover:text-red-600"
+                      >
+                        Cancel
+                      </button>
                     </div>
                     {progressPct !== null && (
                       <div className="w-full">
@@ -255,6 +288,9 @@ export default function ToolTemplate({
                   </div>
                 )}
 
+                {resultExtra}
+
+                {result.downloads.length > 0 && (
                 <div className="space-y-2">
                   <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
                     Result{result.downloads.length > 1 ? "s" : ""}
@@ -278,6 +314,7 @@ export default function ToolTemplate({
                     </div>
                   ))}
                 </div>
+                )}
               </div>
             )}
           </div>

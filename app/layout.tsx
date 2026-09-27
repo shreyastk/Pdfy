@@ -6,6 +6,8 @@ import Footer from "@/components/Footer";
 import LoadingOverlay from "@/components/LoadingOverlay";
 import ThemeController from "@/components/ThemeController";
 import PwaController from "@/components/PwaController";
+import ContinueBar from "@/components/ContinueBar";
+import CommandPalette from "@/components/CommandPalette";
 import { Suspense } from "react";
 
 import { Open_Sans } from "next/font/google"; // Changed from Geist
@@ -50,6 +52,8 @@ export default function RootLayout({
           {children}
         </main>
         <Footer />
+        <ContinueBar />
+        <CommandPalette />
       </body>
     </html>
   );

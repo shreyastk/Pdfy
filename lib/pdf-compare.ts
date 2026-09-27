@@ -18,6 +18,7 @@
  */
 
 import type { Rect } from "./types";
+import { loadPdfjs } from "@/lib/pdfjs";
 
 // ---------------------------------------------------------------------------
 // Public types
@@ -289,8 +290,7 @@ async function loadDocument(
   file: File,
   which: "first" | "second",
 ): Promise<PdfJsDocument> {
-  const pdfjsLib = await import("pdfjs-dist");
-  pdfjsLib.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.mjs`;
+  const pdfjsLib = await loadPdfjs();
 
   const arrayBuffer = await file.arrayBuffer();
   try {

@@ -66,6 +66,10 @@ export default function RecentFiles() {
         )}
       </div>
 
+      <p className="-mt-2 mb-4 text-xs text-slate-500 dark:text-slate-400">
+        Only file names are remembered, in this browser. The files themselves are never stored.
+      </p>
+
       {entries.length === 0 ? (
         <p className="py-8 text-center text-sm text-slate-500 dark:text-slate-400">
           No recent files yet. Files you process will appear here.

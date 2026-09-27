@@ -1,5 +1,8 @@
 import { PDFDocument, degrees, rgb, StandardFonts } from "pdf-lib";
-import { encryptPDF as encryptPDFBytes } from "@pdfsmaller/pdf-encrypt-lite";
+import { encryptPDF as encryptPDFBytes } from "@pdfsmaller/pdf-encrypt";
+import { loadPdfjs } from "@/lib/pdfjs";
+import { compressPdf } from "@/lib/compress";
+import { saveFile } from "@/lib/download";
 
 export async function signPDF(
   file: File,
@@ -114,8 +117,7 @@ export async function addPageNumbers(
 export async function extractPDFText(file: File): Promise<string> {
   const arrayBuffer = await file.arrayBuffer();
 
-  const pdfjsLib = await import("pdfjs-dist");
-  pdfjsLib.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.mjs`;
+  const pdfjsLib = await loadPdfjs();
 
   const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
   let fullText = "";
@@ -235,93 +237,10 @@ export async function rotatePDF(
   return await pdf.save();
 }
 
+/** Compress with the balanced preset, preserving text and page sizes. See lib/compress.ts. */
 export async function compressPDF(file: File): Promise<Uint8Array> {
-  const arrayBuffer = await file.arrayBuffer();
-
-  // Use PDF.js to render pages to images
-  const pdfjsLib = await import("pdfjs-dist");
-  pdfjsLib.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.mjs`;
-
-  const pdfDoc = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-  const numPages = pdfDoc.numPages;
-
-  // Create a new PDF with jsPDF
-  const { default: jsPDF } = await import("jspdf");
-  // @ts-ignore
-  const newPdf = new jsPDF({
-    orientation: "p",
-    unit: "mm",
-    format: "a4",
-    compress: true
-  });
-
-  for (let i = 1; i <= numPages; i++) {
-    const page = await pdfDoc.getPage(i);
-    const viewport = page.getViewport({ scale: 1.5 }); // Reasonable scale for readability vs size
-
-    // Render to canvas
-    const canvas = document.createElement("canvas");
-    const context = canvas.getContext("2d");
-    if (!context) continue;
-
-    canvas.width = viewport.width;
-    canvas.height = viewport.height;
-
-    await page.render({
-      canvasContext: context,
-      viewport: viewport,
-    }).promise;
-
-    // Convert to JPEG with compression (0.7 quality)
-    const imgData = canvas.toDataURL("image/jpeg", 0.7);
-
-    if (i > 1) {
-      newPdf.addPage();
-    }
-
-    // Add image to new PDF
-    const pdfPageWidth = newPdf.internal.pageSize.getWidth();
-    const pdfPageHeight = newPdf.internal.pageSize.getHeight();
-    newPdf.addImage(imgData, "JPEG", 0, 0, pdfPageWidth, pdfPageHeight, undefined, "FAST");
-  }
-
-  const pdfBlob = newPdf.output("arraybuffer");
-  return new Uint8Array(pdfBlob);
-}
-
-export async function addWatermark(
-  file: File,
-  text: string,
-  options?: {
-    fontSize?: number;
-    opacity?: number;
-    rotation?: number;
-  }
-): Promise<Uint8Array> {
-  const arrayBuffer = await file.arrayBuffer();
-  const pdf = await PDFDocument.load(arrayBuffer);
-  const pages = pdf.getPages();
-  const font = await pdf.embedFont(StandardFonts.HelveticaBold);
-
-  const fontSize = options?.fontSize || 48;
-  const opacity = options?.opacity || 0.3;
-  const rotation = options?.rotation || -45;
-
-  pages.forEach((page) => {
-    const { width, height } = page.getSize();
-    const textWidth = font.widthOfTextAtSize(text, fontSize);
-    page.drawText(text, {
-      x: width / 2 - textWidth / 2,
-      y: height / 2,
-      size: fontSize,
-      font,
-      color: rgb(0.5, 0.5, 0.5),
-      opacity,
-      rotate: degrees(rotation),
-    });
-  });
-
-  return await pdf.save();
+  const { bytes } = await compressPdf(file, { level: "medium" });
+  return bytes;
 }
 
 export async function organizePDF(
@@ -662,22 +581,11 @@ export async function htmlToPDF(
 }
 
 export function downloadPDF(data: Uint8Array, filename: string) {
-  const blob = new Blob([data as BlobPart], { type: "application/pdf" });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = filename;
-  link.click();
-  URL.revokeObjectURL(url);
+  saveFile(data, filename, "application/pdf");
 }
 
 export function downloadImage(blob: Blob, filename: string) {
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = filename;
-  link.click();
-  URL.revokeObjectURL(url);
+  saveFile(blob, filename);
 }
 
 export interface EncryptionOptions {
@@ -701,17 +609,24 @@ export async function encryptPDF(
   const arrayBuffer = await file.arrayBuffer();
   const pdfBytes = new Uint8Array(arrayBuffer);
 
-  // Use @pdfsmaller/pdf-encrypt-lite for encryption
-  // This library preserves all PDF content including metadata automatically
-  // API: encryptPDF(pdfBytes, userPassword, ownerPassword?)
+  // AES-256 (PDF 2.0 / R6 security handler) via @pdfsmaller/pdf-encrypt.
+  // Content and metadata are preserved; only strings/streams are encrypted.
   const ownerPwd = options.ownerPassword || options.userPassword;
+  const p = options.permissions;
 
   try {
-    const encryptedBytes = await encryptPDFBytes(
-      pdfBytes,
-      options.userPassword,
-      ownerPwd
-    );
+    const encryptedBytes = await encryptPDFBytes(pdfBytes, options.userPassword, {
+      ownerPassword: ownerPwd,
+      algorithm: "AES-256",
+      allowPrinting: p?.printing !== "none",
+      allowHighQualityPrint: p?.printing !== "lowResolution" && p?.printing !== "none",
+      allowModifying: p?.modifying ?? true,
+      allowCopying: p?.copying ?? true,
+      allowAnnotating: p?.annotating ?? true,
+      allowFillingForms: p?.fillingForms ?? true,
+      allowExtraction: p?.contentAccessibility ?? true,
+      allowAssembly: p?.documentAssembly ?? true,
+    });
 
     // Verify encryption worked
     if (encryptedBytes.length === 0) {
@@ -732,8 +647,7 @@ export async function decryptPDF(
 
   // Use PDF.js to decrypt and read the encrypted PDF
   // PDF.js properly supports password-protected PDFs
-  const pdfjsLib = await import("pdfjs-dist");
-  pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`;
+  const pdfjsLib = await loadPdfjs();
 
   let pdfDoc: any;
   try {
@@ -778,12 +692,15 @@ export async function decryptPDF(
     const imageBytes = await fetch(imageData).then(res => res.arrayBuffer());
     const image = await newPdf.embedPng(imageBytes);
 
-    const pdfPage = newPdf.addPage([viewport.width, viewport.height]);
+    // Rendered at 2x for sharpness; size the page at the original 1x points.
+    const pageWidth = viewport.width / 2;
+    const pageHeight = viewport.height / 2;
+    const pdfPage = newPdf.addPage([pageWidth, pageHeight]);
     pdfPage.drawImage(image, {
       x: 0,
       y: 0,
-      width: viewport.width,
-      height: viewport.height,
+      width: pageWidth,
+      height: pageHeight,
     });
   }
 

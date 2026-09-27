@@ -136,12 +136,12 @@ export const TOOLS: readonly ToolDefinition[] = [
   {
     slug: "watermark",
     name: "Add Watermark",
-    description: "Add text watermark to PDF pages.",
+    description: "Add text, image, or stamp watermarks to PDF pages.",
     category: "Edit",
     icon: "watermark",
     seoTitle: "Add Watermark to PDF Online Free | PDFy",
     seoDescription:
-      "Stamp a custom text watermark across the pages of your PDF document. Free and private, with every change made locally in your browser.",
+      "Stamp custom text, logo, or rubber-stamp watermarks onto your PDF pages. Free and private, with every change made locally in your browser.",
   },
   {
     slug: "encrypt",
@@ -273,6 +273,138 @@ export const TOOLS: readonly ToolDefinition[] = [
     seoTitle: "Flatten PDF — Lock Forms & Notes | PDFy",
     seoDescription:
       "Bake form field values and annotation appearances into static page content so the result has no interactive objects. Fully in-browser.",
+  },
+  {
+    slug: "pdf-to-markdown",
+    name: "PDF to Markdown",
+    description: "Convert PDF text to Markdown with headings and lists.",
+    category: "Convert",
+    icon: "markdown",
+    isNew: true,
+    seoTitle: "Convert PDF to Markdown Online | PDFy",
+    seoDescription:
+      "Turn PDF documents into clean Markdown with headings, lists, and paragraphs, ready for notes, docs, or AI tools. Converted privately in-browser.",
+  },
+  {
+    slug: "bookmarks",
+    name: "Edit Bookmarks",
+    description: "Add, edit, or remove the PDF table of contents.",
+    category: "Edit",
+    icon: "bookmarks",
+    isNew: true,
+    seoTitle: "Edit PDF Bookmarks & Outline | PDFy",
+    seoDescription:
+      "Create, rename, nest, and remove PDF bookmarks to build a clickable table of contents. Your document is edited locally, never uploaded.",
+  },
+  {
+    slug: "metadata",
+    name: "Edit Metadata",
+    description: "View, edit, or strip hidden PDF metadata.",
+    category: "Security",
+    icon: "metadata",
+    isNew: true,
+    seoTitle: "Edit or Remove PDF Metadata | PDFy",
+    seoDescription:
+      "Change the title, author, and keywords of a PDF, or strip hidden metadata like XMP and edit history before sharing. Fully private.",
+  },
+  {
+    slug: "header-footer",
+    name: "Headers & Footers",
+    description: "Add headers, footers, and Bates numbers to pages.",
+    category: "Edit",
+    icon: "headerFooter",
+    isNew: true,
+    seoTitle: "Add Headers, Footers & Bates Numbers | PDFy",
+    seoDescription:
+      "Stamp custom headers and footers with page numbers, dates, file names, or legal Bates numbering onto your PDF, right in your browser.",
+  },
+  {
+    slug: "grayscale",
+    name: "Grayscale PDF",
+    description: "Convert a color PDF to black and white.",
+    category: "Optimize",
+    icon: "grayscale",
+    isNew: true,
+    seoTitle: "Convert PDF to Grayscale Online | PDFy",
+    seoDescription:
+      "Make a print-friendly black and white copy of any PDF while keeping text selectable. Colors are converted locally without any upload.",
+  },
+  {
+    slug: "remove-blank-pages",
+    name: "Remove Blank Pages",
+    description: "Detect and delete empty pages automatically.",
+    category: "Organize",
+    icon: "removeBlank",
+    isNew: true,
+    seoTitle: "Remove Blank Pages from PDF | PDFy",
+    seoDescription:
+      "Automatically find empty or near-empty scanned pages in a PDF, review them, and remove them in one click. Everything runs in-browser.",
+  },
+  {
+    slug: "verify-signatures",
+    name: "Verify Signatures",
+    description: "Check whether a signed PDF was altered after signing.",
+    category: "Security",
+    icon: "verify",
+    isNew: true,
+    seoTitle: "Verify PDF Digital Signatures | PDFy",
+    seoDescription:
+      "Inspect the digital signatures in a PDF, see who signed it and when, and check the document was not changed after signing. No uploads.",
+  },
+  {
+    slug: "repair",
+    name: "Repair PDF",
+    description: "Recover damaged or corrupted PDF files.",
+    category: "Optimize",
+    icon: "repair",
+    isNew: true,
+    seoTitle: "Repair Corrupted PDF Files Free | PDFy",
+    seoDescription:
+      "Fix PDFs that will not open by rebuilding their internal structure, or recover pages from badly damaged files. Repaired on your device.",
+  },
+  {
+    slug: "extract-images",
+    name: "Extract Images",
+    description: "Save every picture embedded in a PDF as a file.",
+    category: "Convert",
+    icon: "extractImages",
+    isNew: true,
+    seoTitle: "Extract Images from PDF Online | PDFy",
+    seoDescription:
+      "Pull every photo and graphic out of a PDF at original quality and download them as JPG or PNG files. Nothing is uploaded anywhere.",
+  },
+  {
+    slug: "remove-annotations",
+    name: "Remove Annotations",
+    description: "Delete comments, highlights, and markup from a PDF.",
+    category: "Edit",
+    icon: "removeAnnotations",
+    isNew: true,
+    seoTitle: "Remove PDF Comments & Annotations | PDFy",
+    seoDescription:
+      "Strip sticky notes, highlights, drawings, and review comments from a PDF while keeping links and form fields if you want. Fully private.",
+  },
+  {
+    slug: "interleave",
+    name: "Interleave Pages",
+    description: "Alternate pages from two PDFs, ideal for duplex scans.",
+    category: "Organize",
+    icon: "interleave",
+    isNew: true,
+    seoTitle: "Interleave PDF Pages — Merge Duplex Scans | PDFy",
+    seoDescription:
+      "Combine a front-sides scan and a back-sides scan into one correctly ordered PDF, with automatic reversal of the second stack. In-browser.",
+  },
+  {
+    slug: "batch",
+    name: "Batch Process",
+    description: "Apply one action to many PDFs at once.",
+    category: "Optimize",
+    icon: "batch",
+    isNew: true,
+    seoTitle: "Batch Process PDFs — Many Files at Once | PDFy",
+    seoDescription:
+      "Compress, convert to grayscale, strip metadata, flatten, or repair up to 100 PDFs in one go and download them all as a ZIP archive.",
   },
 ] as const;
 

@@ -32,6 +32,7 @@
  */
 
 import { htmlToPDF } from "./pdf-operations";
+import { loadPdfjs } from "@/lib/pdfjs";
 
 // ---------------------------------------------------------------------------
 // Public types
@@ -330,8 +331,7 @@ export async function pdfToOffice(
 async function defaultExtractPdfText(file: File): Promise<string[]> {
   const bytes = new Uint8Array(await file.arrayBuffer());
 
-  const pdfjsLib = await import("pdfjs-dist");
-  pdfjsLib.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.mjs`;
+  const pdfjsLib = await loadPdfjs();
 
   const pdf = await pdfjsLib.getDocument({ data: bytes.slice() as Uint8Array }).promise;
   const pages: string[] = [];

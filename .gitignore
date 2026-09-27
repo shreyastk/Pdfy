@@ -58,3 +58,6 @@ Desktop.ini
 .idea/
 *.swp
 *.swo
+
+# generated vendor assets (scripts/copy-assets.mjs)
+/public/vendor/

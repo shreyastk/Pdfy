@@ -3,6 +3,7 @@
 import { useState } from "react";
 import FileUploader from "@/components/FileUploader";
 import { extractPDFText } from "@/lib/pdf-operations";
+import { saveFile } from "@/lib/download";
 
 export default function ExtractText() {
     const [file, setFile] = useState<File | null>(null);
@@ -32,13 +33,7 @@ export default function ExtractText() {
     };
 
     const downloadText = () => {
-        const blob = new Blob([text], { type: "text/plain" });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        link.href = url;
-        link.download = `${file?.name.replace(".pdf", "")}.txt`;
-        link.click();
-        URL.revokeObjectURL(url);
+        saveFile(new Blob([text], { type: "text/plain" }), `${file?.name.replace(/\.pdf$/i, "")}.txt`);
     };
 
     return (

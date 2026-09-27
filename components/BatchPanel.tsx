@@ -8,6 +8,7 @@ import {
   type BatchItem,
   type FileStatus,
 } from "@/lib/batch";
+import { saveFile } from "@/lib/download";
 
 const ACCENT = "#009966";
 
@@ -63,12 +64,7 @@ function validationMessage(reason: "too-many" | "none" | "too-large"): string {
 }
 
 function downloadBlob(blob: Blob, filename: string): void {
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = filename;
-  link.click();
-  URL.revokeObjectURL(url);
+  saveFile(blob, filename);
 }
 
 /**

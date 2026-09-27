@@ -30,7 +30,7 @@ All PDF processing is performed entirely client-side in your browser. No user fi
 - **PDF to Images** — Convert PDF pages to JPG or PNG.
 - **Images to PDF** — Convert images to PDF document.
 - **Organize Pages** — Reorder, rotate, or delete PDF pages.
-- **Add Watermark** — Add text watermark to PDF pages.
+- **Add Watermark** — Add text, image, or stamp watermarks to PDF pages.
 - **Encrypt PDF** — Protect your PDF files with a password.
 - **Unlock PDF** — Remove passwords from PDF files.
 - **HTML to PDF** — Convert HTML files or code to PDF documents.
@@ -43,6 +43,18 @@ All PDF processing is performed entirely client-side in your browser. No user fi
 - **Crop & Resize** — Crop margins or change PDF page dimensions.
 - **Page Layout** — Arrange pages with N-up or booklet imposition.
 - **Flatten PDF** — Flatten form fields and annotations into the page.
+- **PDF to Markdown** — Convert PDF text to Markdown with headings and lists.
+- **Edit Bookmarks** — Add, edit, or remove the PDF table of contents.
+- **Edit Metadata** — View, edit, or strip hidden PDF metadata.
+- **Headers & Footers** — Add headers, footers, and Bates numbers to pages.
+- **Grayscale PDF** — Convert a color PDF to black and white.
+- **Remove Blank Pages** — Detect and delete empty pages automatically.
+- **Verify Signatures** — Check whether a signed PDF was altered after signing.
+- **Repair PDF** — Recover damaged or corrupted PDF files.
+- **Extract Images** — Save every picture embedded in a PDF as a file.
+- **Remove Annotations** — Delete comments, highlights, and markup from a PDF.
+- **Interleave Pages** — Alternate pages from two PDFs, ideal for duplex scans.
+- **Batch Process** — Apply one action to many PDFs at once.
 
 ## 🚀 Getting Started
 
@@ -57,14 +69,26 @@ If you want to run my code locally, here is how you can do it:
 
 ```bash
 # Clone the repository
-git clone https://github.com/shreyas/pdf0.git
-cd pdfy
+git clone https://github.com/shreyastk/Pdfy.git
+cd Pdfy
 
 # Install dependencies
 npm install
 
 # Start development server
 npm run dev
+```
+
+`npm run dev` and `npm run build` first copy the PDF.js worker and the OCR engine
+into `public/vendor/` (see `scripts/copy-assets.mjs`), so the app never loads code
+from a CDN at runtime. `npm run build` also stamps a fresh cache version into the
+service worker so every deploy invalidates old offline caches.
+
+### Tests
+
+```bash
+npm run test:run   # unit + property tests (Vitest)
+npm run test:e2e   # end-to-end tests in a real browser (Playwright)
 ```
 
 Open [http://localhost:3000](http://localhost:3000) in your browser.

@@ -245,7 +245,7 @@ export default function EncryptPDF() {
                         </div>
                         <div className="flex items-start gap-2.5">
                           <span className="text-green-600 font-bold mt-0.5">✓</span>
-                          <span><strong>Industry Standard:</strong> Uses RC4 128-bit encryption - the same security used by professional PDF tools. Works with any PDF reader.</span>
+                          <span><strong>Industry Standard:</strong> Uses AES-256 encryption (the PDF 2.0 standard). Opens in Adobe Acrobat, browsers, and all modern PDF readers.</span>
                         </div>
                         <div className="flex items-start gap-2.5">
                           <span className="text-green-600 font-bold mt-0.5">✓</span>
@@ -303,7 +303,7 @@ export default function EncryptPDF() {
                 </svg>
               </div>
               <h3 className="font-bold text-slate-900 text-sm mb-1">Strong Encryption</h3>
-              <p className="text-xs text-slate-600">Industry-standard RC4 128-bit encryption</p>
+              <p className="text-xs text-slate-600">Industry-standard AES-256 encryption</p>
             </div>
             <div className="p-4 bg-white/60 backdrop-blur rounded-2xl">
               <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-2">
